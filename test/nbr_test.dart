@@ -1,51 +1,67 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:nbr/nbr.dart';
 import 'package:test/test.dart';
 
-class SampleRepository extends NetworkBoundResource {
-  final Set<int> _mockStore = {};
-
-  Future<Resource<int>> mockRepositoryMethod() async {
-    return run<int, String>(
-      fetchFromAPI: () =>
-          Future.delayed(Duration(milliseconds: 230), () => '42'),
-      loadFromDB: () => _mockStore.first,
-      storeToDB: (int value) async {
-        _mockStore.add(value);
-      },
-      shouldFetch: (int? value) => value == null,
-      mapDTOToEntity: (String value) => int.tryParse(value) ?? 0,
-    ).first;
-  }
-
-  Stream<Resource<int>> mockRepositoryMethod2() async* {
-    yield* run<int, String>(
-      fetchFromAPI: () =>
-          Future.delayed(Duration(milliseconds: 230), () => '42'),
-      loadFromDB: () => _mockStore.first,
-      storeToDB: (int value) async {
-        _mockStore.add(value);
-      },
-      shouldFetch: (int? value) => true,
-      mapDTOToEntity: (String value) => int.tryParse(value) ?? 0,
-    );
-  }
-}
-
 void main() {
+  final repository = _SampleRepository();
+
   group('NetworkBoundResource', () {
-    final repository = SampleRepository();
+    test('should collect values', () async {
+      final streamValues =
+          await repository.fetchPackageDependencies('get_it').toList();
+      for (var element in streamValues) {
+        print('Type: ${element.runtimeType}');
+        print('Data: ${element.baseData}, exception: ${element.baseException}');
+        print('---\n');
+      }
 
-    test('should return value', () async {
-      final result = await repository.mockRepositoryMethod();
-      print('Result from repository: $result');
-      expect(result, 42);
-    });
-
-    test('should emit correctly', () async {
-      final events = await repository.mockRepositoryMethod2().toList();
-      print('Events from repository: $events');
-
-      expect(events, [Resource.loading(null), Resource.success(42)]);
+      expect(streamValues.length, 2);
+      expect(streamValues.first is Loading, true);
+      expect(streamValues.last is Success, true);
+      expect(streamValues.last.baseData?.value.isNotEmpty, true);
     });
   });
+}
+
+class _SampleRepository extends NetworkBoundResource {
+  final Map<String, List<String>> _mockDB = {};
+  final HttpClient _client = HttpClient();
+
+  Stream<Resource<MapEntry<String, List<String>>>> fetchPackageDependencies(
+    String package,
+  ) async* {
+    yield* run<MapEntry<String, List<String>>, List<String>>(
+      fetchFromAPI: () async => await _fetchDependencies(package),
+      loadFromDB: () {
+        final versions = _mockDB[package];
+        return versions != null ? MapEntry(package, versions) : null;
+      },
+      storeToDB: (entry) => _persistDependencies(entry.key, entry.value),
+      shouldFetch: (entry) => entry == null || !_mockDB.containsKey(package),
+      mapDTOToEntity: (versions) => MapEntry(package, versions),
+    );
+  }
+
+  Future<List<String>> _fetchDependencies(String package) async {
+    final url = Uri.https('pub.dev', 'packages/$package.json');
+    final request = await _client.getUrl(url);
+    final response = await request.close();
+
+    if (response.statusCode != 200) {
+      throw Exception('API returned ${response.statusCode}');
+    }
+
+    final body = await response
+        .transform(Utf8Decoder(allowMalformed: true))
+        .reduce((previous, element) => previous + element);
+    return ((json.decode(body) as Map<String, dynamic>)['versions']
+            as List<dynamic>)
+        .cast<String>();
+  }
+
+  void _persistDependencies(String package, List<String> versions) {
+    _mockDB[package] = versions;
+  }
 }
