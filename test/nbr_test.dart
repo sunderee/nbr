@@ -32,7 +32,7 @@ class _SampleRepository extends NetworkBoundResource {
   Stream<Resource<MapEntry<String, List<String>>>> fetchPackageDependencies(
     String package,
   ) async* {
-    yield* run<MapEntry<String, List<String>>, List<String>>(
+    yield* fetch<MapEntry<String, List<String>>, List<String>>(
       fetchFromAPI: () async => await _fetchDependencies(package),
       loadFromDB: () {
         final versions = _mockDB[package];
