@@ -4,7 +4,7 @@ import 'package:nbr/src/resource.dart';
 import 'package:nbr/src/typedefs.dart';
 
 abstract class NetworkBoundResource {
-  Stream<Resource<Entity>> fetchNetworkBoundResource<Entity, DTO>({
+  Stream<Resource<Entity>> fetch<Entity, DTO>({
     required FetchFromApiCallback<DTO> fetchFromAPI,
     required LoadFromDBCallback<Entity> loadFromDB,
     required StoreToDBCallback<Entity> storeToDB,

@@ -28,7 +28,7 @@ Then, you can use the `run()` method which returns a stream of `Resource` object
 Stream<Resource<MapEntry<String, List<String>>>> fetchPackageDependencies(
     String package,
 ) async* {
-    yield* run<MapEntry<String, List<String>>, List<String>>(
+    yield* fetch<MapEntry<String, List<String>>, List<String>>(
         fetchFromAPI: () async => await _fetchDependencies(package),
         loadFromDB: () {
             final versions = _mockDB[package];
