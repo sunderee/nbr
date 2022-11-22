@@ -22,7 +22,7 @@ Your repository class should extend [NetworkBoundResource].
 class MyRepositoryImpl extends NetworkBoundResource implements IMyRepository {}
 ```
 
-Then, you can use the `run()` method which returns a stream of `Resource` objects. For example
+Then, you can use the `fetch()` method which returns a stream of `Resource` objects. For example
 
 ```dart
 Stream<Resource<MapEntry<String, List<String>>>> fetchPackageDependencies(
