@@ -38,7 +38,7 @@ void main() {
     });
 
     test('should create failed resource', () {
-      final res = Resource.failed(Exception(false), null);
+      final res = Resource<dynamic>.failed(Exception(false));
 
       expect(res.baseData, null);
       expect(res.baseException != null, true);

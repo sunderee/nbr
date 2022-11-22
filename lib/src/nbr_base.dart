@@ -11,6 +11,7 @@ abstract class NetworkBoundResource {
     required ShouldFetchCallback<Entity> shouldFetch,
     required MapDTOToEntity<DTO, Entity> mapDTOToEntity,
   }) async* {
+    yield* _emit(Resource.loading(null));
     final data = await loadFromDB();
 
     if (shouldFetch(data)) {
@@ -23,7 +24,7 @@ abstract class NetworkBoundResource {
 
         yield* _emit(Resource.success(entity));
       } on Exception catch (exception) {
-        yield* _emit(Resource.failed(exception, data));
+        yield* _emit(Resource.failed(exception));
       }
     } else {
       if (data != null) {

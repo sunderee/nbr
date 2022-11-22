@@ -22,7 +22,7 @@ abstract class Resource<T> {
   const factory Resource.success(T data) = Success;
 
   @protected
-  const factory Resource.failed(Exception exception, T? data) = Failed;
+  const factory Resource.failed(Exception exception) = Failed;
 }
 
 class Empty<T> extends Resource<T> {
@@ -43,7 +43,6 @@ class Success<T> extends Resource<T> {
 
 class Failed<T> extends Resource<T> {
   final Exception exception;
-  final T? data;
 
-  const Failed(this.exception, this.data) : super(data, exception);
+  const Failed(this.exception) : super(null, exception);
 }

@@ -17,7 +17,7 @@ void main() {
         print('---\n');
       }
 
-      expect(streamValues.length, 2);
+      expect(streamValues.length, 3);
       expect(streamValues.first is Loading, true);
       expect(streamValues.last is Success, true);
       expect(streamValues.last.baseData?.value.isNotEmpty, true);
