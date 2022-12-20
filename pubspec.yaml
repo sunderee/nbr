@@ -1,6 +1,6 @@
 name: nbr
 description: Generic implementation of the network-bound-resource algorithm in Dart
-version: 0.0.4
+version: 0.0.5
 publish_to: "none"
 
 environment:
@@ -11,4 +11,4 @@ dependencies:
 
 dev_dependencies:
   lints: ^2.0.1
-  test: ^1.22.0
+  test: ^1.22.1
