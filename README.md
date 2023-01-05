@@ -4,17 +4,6 @@ Generic implementation of the network-bound-resource algorithm in Dart.
 
 ## Usage
 
-You can add this library as a Git dependency to your project:
-
-```yaml
-dependencies:
-  # ...
-  nbr:
-    git:
-      url: git@github.com:sunderee/nbr.git
-      ref: master
-```
-
 Your repository class should extend [NetworkBoundResource].
 
 ```dart
@@ -40,7 +29,3 @@ Stream<Resource<MapEntry<String, List<String>>>> fetchPackageDependencies(
     );
 }
 ```
-
-## License
-
-Project is open-sourced under the MIT license.
